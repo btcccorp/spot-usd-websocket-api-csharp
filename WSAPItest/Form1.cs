@@ -135,9 +135,7 @@ namespace WSAPITest
             request.ClientRequestId = Guid.NewGuid().ToString("N");
             request.Account = credentials.Account;
             request.Date = DateTime.UtcNow.ToString("yyyyMMdd");
-            request.Signature = SignatureEngine.ComputeSignature(
-                SignatureEngine.ComputeHash(credentials.Key),
-                SignatureEngine.PrepareMessage(request));
+            request.Signature = $"ALPHA-{SignatureEngine.ComputeSignature(SignatureEngine.ComputeHash(credentials.Key), SignatureEngine.PrepareMessage(request, SignatureEngine.MessageSignatureOrdering.Alphabetical))}";
             return request;
         }
 
@@ -151,6 +149,7 @@ namespace WSAPITest
 
             // add specified response type listeners to deserializer
             deserializer.On<Ticker>(DisplayTicker);
+            deserializer.On<ErrorResponse>(DisplayErrorResponse);
             deserializer.On<AccountInfo>(DisplayAccount);
             deserializer.On<GetAccountInfoResponse>(response => DisplayAccount(response.AccountInfo));
             deserializer.On<ExecReport>(DisplayExecReport);
@@ -189,6 +188,11 @@ namespace WSAPITest
             ws.Connect(); // start connecting to remote websocket API server
 
             AppendReceiverBox("Connected");
+        }
+
+        private void DisplayErrorResponse(ErrorResponse obj)
+        {
+            AppendReceiverBox($"ErrorResponse: OriginalMsgType: {obj.OriginalMsgType} Reason: {obj.Reason}");
         }
 
         // QuoteReq Button
