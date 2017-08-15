@@ -185,7 +185,10 @@ namespace WSAPITest
                 AppendReceiverBox($"Connection closed: {b.Reason}");
             };
 
-            ws.Connect(); // start connecting to remote websocket API server
+			// fix for tls version issue
+			ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls11 | System.Security.Authentication.SslProtocols.Tls;
+
+			ws.Connect(); // start connecting to remote websocket API server
 
             AppendReceiverBox("Connected");
         }
@@ -297,15 +300,16 @@ namespace WSAPITest
                 Symbol = "BTCUSD"
             })));
         }
-    } 
-    #endregion
+    }
+	#endregion
 
 
-    // settings
-    public static class WS
+	// settings
+	public static class WS
     {
-        public const string APIURL = "wss://spotusd-wsp.btcc.com";
-        public const string SYMBOL = "BTCUSD";
+		//public const string APIURL = "wss://plus-wsp.btcchina.com";
+		public const string APIURL = "wss://spotusd-wsp.btcc.com";
+        public const string SYMBOL = "BTCUSD"; //ICOCNY
         public const string BPI = "BPIUSD";
         public const string ACCESS_KEY = ""; // Your Access_key
         public const string SECRET_KEY = ""; // Your Secret_key
